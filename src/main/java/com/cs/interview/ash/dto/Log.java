@@ -27,4 +27,20 @@ public class Log {
     public String getId() {
         return id;
     }
+
+    public String getState() {
+        return state;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public long getTimeStamp() {
+        return timeStamp;
+    }
 }
