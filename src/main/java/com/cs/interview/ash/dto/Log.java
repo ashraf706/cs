@@ -43,4 +43,15 @@ public class Log {
     public long getTimeStamp() {
         return timeStamp;
     }
+
+    @Override
+    public String toString() {
+        return "Log{" +
+                "id='" + id + '\'' +
+                ", state='" + state + '\'' +
+                ", type='" + type + '\'' +
+                ", host='" + host + '\'' +
+                ", timeStamp=" + timeStamp +
+                '}';
+    }
 }
