@@ -7,8 +7,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -16,13 +16,13 @@ import static org.junit.Assert.assertThat;
 
 public class LogProducerTest {
 
-    private HashMap<String, List<Log>> container;
+    private ConcurrentHashMap<String, List<Log>> container;
     private Object mutex;
     private final static String SAMPLE_LOG_KEY = "scsmbstgra";
 
     @Before
     public void setUp() {
-        container = new HashMap<>();
+        container = new ConcurrentHashMap<>();
         mutex = new Object();
     }
 

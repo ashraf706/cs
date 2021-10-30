@@ -1,5 +1,6 @@
 package com.cs.interview.ash.producer;
 
+import com.cs.interview.ash.consumer.Consumer;
 import com.cs.interview.ash.dto.Log;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class LogProducer implements Producer {
     private final ObjectMapper mapper = new ObjectMapper();
@@ -20,26 +22,32 @@ public class LogProducer implements Producer {
     private final HashMap<String, List<Log>> localContainer = new HashMap<>();
     private final Object mutex;
     private static final int CONTAINER_BUFFER_SIZE = 5;
+    private final List<Consumer> consumers = new ArrayList<>();
 
     public LogProducer(Object mutex) {
         this.mutex = mutex;
     }
 
     @Override
-    public void produce(HashMap<String, List<Log>> container, Path path) throws IOException {
-        logger.debug("Producer started");
+    public void produce(ConcurrentHashMap<String, List<Log>> container, Path path) throws IOException {
+        logger.info("Producer started");
 
         try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             for (String line; (line = reader.readLine()) != null; ) {
                 Log log = mapper.readValue(line, Log.class);
                 addToContainer(log, container);
-                notifyConditionally(container.size());
+                //notifyConditionally(container.size());
             }
         }
 
-        logger.debug("Container size " + container.size());
         logStatus();
-        notifyUnconditionally(container.size());
+        updateConsumers();
+        notifyUnconditionally();
+    }
+
+    @Override
+    public boolean register(Consumer consumer) {
+        return consumers.add(consumer);
     }
 
     /**
@@ -47,13 +55,13 @@ public class LogProducer implements Producer {
      */
     private void notifyConditionally(int containerSize) {
         if (containerSize > 0 && containerSize % CONTAINER_BUFFER_SIZE == 0) {
-            notifyUnconditionally(containerSize);
+            notifyUnconditionally();
         }
     }
 
-    private void notifyUnconditionally(int containerSize) {
+    private void notifyUnconditionally() {
         synchronized (mutex) {
-            logger.debug("Producer Notify. Container size is: {}", containerSize);
+            logger.debug("Producer Notify ==>> consumer");
             mutex.notifyAll();
         }
     }
@@ -65,12 +73,13 @@ public class LogProducer implements Producer {
      * In this way this function make sure the global Container always has list value with 2 Log object
      * for the same key.
      */
-    private void addToContainer(Log log, HashMap<String, List<Log>> container) {
+    private void addToContainer(Log log, ConcurrentHashMap<String, List<Log>> container) {
         final String id = log.getId();
         if (localContainer.containsKey(id)) {
             final List<Log> logs = localContainer.remove(id);
             logs.add(log);
             container.put(id, logs);
+            notifyConditionally(container.size());
         } else {
             final ArrayList<Log> logs = new ArrayList<>();
             logs.add(log);
@@ -92,5 +101,10 @@ public class LogProducer implements Producer {
         } else {
             logger.info("Log file process completed successfully.");
         }
+        logger.info("**************** Producer Completed ****************");
+    }
+
+    private void updateConsumers() {
+        consumers.forEach(c -> c.producerStatus(true));
     }
 }

@@ -11,15 +11,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class LogConsumerTest {
-    private static final HashMap<String, List<Log>> container = new HashMap<>();
+    private static final ConcurrentHashMap<String, List<Log>> container = new ConcurrentHashMap<>();
 
     @Before
     public void setUp() throws Exception {
@@ -28,21 +27,22 @@ public class LogConsumerTest {
 
     @Test
     public void shouldBeAbleToProcessContainer() {
-        final LogConsumer logConsumer = new LogConsumer();
+        final LogConsumer logConsumer = new LogConsumer(new Object());
         final ArrayList<Event> events = new ArrayList<>();
 
-        logConsumer.consume(container,events);
+        logConsumer.consume(container, events);
 
         assertThat("events should contain 3 objects", events.size(), equalTo(3));
     }
 
     /**
      * Uses LogProducer to generate sample data
+     *
      * @throws IOException
      */
     private void updateContainerWithSampleLog() throws IOException {
         Path path = Paths.get(this.getClass().getClassLoader().getResource("small-log.txt").getPath());
-        final Producer producer = new LogProducer();
+        final Producer producer = new LogProducer(new Object());
 
         producer.produce(container, path);
     }
