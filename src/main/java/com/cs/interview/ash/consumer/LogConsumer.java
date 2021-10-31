@@ -30,6 +30,8 @@ public class LogConsumer implements Consumer {
 
         }
 
+        createAndAddEvent(container, events);
+
         logger.info("<<<<<<<<<<<<<< Consumer Completed >>>>>>>>>>>>>>>>>");
     }
 

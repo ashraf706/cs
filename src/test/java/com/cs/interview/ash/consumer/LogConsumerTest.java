@@ -13,6 +13,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -26,12 +29,18 @@ public class LogConsumerTest {
     }
 
     @Test
-    public void shouldBeAbleToProcessContainer() {
-        final LogConsumer logConsumer = new LogConsumer(new Object());
+    public void shouldBeAbleToProcessContainer() throws InterruptedException {
+        final Object mutex = new Object();
+        final LogConsumer logConsumer = new LogConsumer(mutex);
         final ArrayList<Event> events = new ArrayList<>();
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        executor.execute(() -> {
+            logConsumer.consume(container, events);
 
-        logConsumer.consume(container, events);
+        });
 
+        executor.awaitTermination(2, TimeUnit.SECONDS);
+        logConsumer.producerStatus(true);
         assertThat("events should contain 3 objects", events.size(), equalTo(3));
     }
 
