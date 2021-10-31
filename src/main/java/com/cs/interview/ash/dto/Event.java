@@ -14,4 +14,24 @@ public class Event {
         this.host = host;
         this.alert = alert;
     }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public boolean isAlert() {
+        return alert;
+    }
 }
