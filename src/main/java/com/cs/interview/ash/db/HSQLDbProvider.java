@@ -41,8 +41,11 @@ public class HSQLDbProvider implements Provider {
 
     private void startServer() {
         server = new Server();
+        server.setLogWriter(null);
+        server.setSilent(true);
         server.setDatabaseName(0, DB_NAME);
         server.setDatabasePath(0, DB_LOCATION);
+        server.start();
     }
 
     private void insertRecord(List<Event> events) throws SQLException {

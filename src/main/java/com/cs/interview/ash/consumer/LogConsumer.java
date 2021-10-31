@@ -52,7 +52,9 @@ public class LogConsumer implements Consumer {
             counter++;
             iter.remove();
         }
-        logger.debug("{} Event object created", counter);
+        if(counter > 0) {
+            logger.debug("{} Event object created", counter);
+        }
     }
 
     /**
