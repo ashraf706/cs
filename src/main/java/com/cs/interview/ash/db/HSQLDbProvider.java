@@ -5,10 +5,7 @@ import org.hsqldb.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 public class HSQLDbProvider implements Provider {
@@ -76,6 +73,21 @@ public class HSQLDbProvider implements Provider {
     private void prepareDatabase() throws SQLException, ClassNotFoundException {
         startServer();
         createConnection();
+        createTable();
+
+    }
+
+    /**
+     * Crete Event table if not present
+     */
+    private void createTable() throws SQLException {
+        final ResultSet rs = con.getMetaData().getTables(null, null, "EVENT", null);
+        if(!rs.next()){
+            logger.info("Database table 'Event' not found. Creating table");
+            con.prepareStatement(
+                    "create table event(eventid varchar(100),duration int,type varchar(20),host varchar(60),alert boolean);"
+                    ).execute();
+        }
     }
 
     private void createConnection() throws ClassNotFoundException, SQLException {
