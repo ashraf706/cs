@@ -10,9 +10,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * The LogConsumer is a simple consumer in a producer consumer model.
+ * The consumer register itself with the producer and consume data
+ * form the event concurrent hash map. It waits to get notified by
+ * the producer if the map is empty.
+ */
 public class LogConsumer implements Consumer {
 
     private static final Logger logger = LoggerFactory.getLogger(LogConsumer.class);
+    public static final String STARTED = "STARTED";
     private boolean producerIsProducing = true;
     private final Object mutex;
 
@@ -25,13 +32,10 @@ public class LogConsumer implements Consumer {
         logger.info("Consumer started");
         while (producerIsProducing) {
             waitIfContainerIsEmpty(container.isEmpty());
-
             createAndAddEvent(container, events);
-
         }
 
         createAndAddEvent(container, events);
-
         logger.info("<<<<<<<<<<<<<< Consumer Completed >>>>>>>>>>>>>>>>>");
     }
 
@@ -46,14 +50,16 @@ public class LogConsumer implements Consumer {
      */
     private void createAndAddEvent(ConcurrentHashMap<String, List<Log>> container, List<Event> events) {
         int counter = 0;
+
         for (Iterator<Map.Entry<String, List<Log>>> iter = container.entrySet().iterator(); iter.hasNext(); ) {
             Map.Entry<String, List<Log>> entry = iter.next();
             events.add(eventFromLogs(entry.getValue()));
             counter++;
             iter.remove();
         }
+
         if(counter > 0) {
-            logger.debug("{} Event object created", counter);
+            logger.debug("{} Event object(s) created", counter);
         }
     }
 
@@ -79,7 +85,7 @@ public class LogConsumer implements Consumer {
         final Log log1 = logs.get(0);
         final Log log2 = logs.get(1);
 
-        final long duration = log1.getState().equals("STARTED") ?
+        final long duration = log1.getState().equals(STARTED) ?
                 log2.getTimeStamp() - log1.getTimeStamp() :
                 log1.getTimeStamp() - log2.getTimeStamp();
 

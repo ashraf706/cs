@@ -16,6 +16,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Simple producer implementation of a producer consumer model.
+ * The producer update its status to the registered consumer
+ * once it completes it task. The producer shares a concurrent hash map
+ * with consumers. The producer only add data to the hash map.
+ */
 public class LogProducer implements Producer {
     private final ObjectMapper mapper = new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(LogProducer.class);
@@ -36,7 +42,6 @@ public class LogProducer implements Producer {
             for (String line; (line = reader.readLine()) != null; ) {
                 Log log = mapper.readValue(line, Log.class);
                 addToContainer(log, container);
-                //notifyConditionally(container.size());
             }
         }
 
