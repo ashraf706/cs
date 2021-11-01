@@ -23,7 +23,7 @@ public class HSQLDbProvider implements Provider {
         try {
             prepareDatabase();
             insertRecord(events);
-            stopServer();
+            saveAndStopServer();
         } catch (SQLException | ClassNotFoundException e) {
             logger.error("Unexpected error occurred while preparing database.", e);
             throw e;
@@ -60,14 +60,14 @@ public class HSQLDbProvider implements Provider {
                 statement.setBoolean(5, e.isAlert());
 
                 statement.execute();
-                con.commit();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
         });
     }
 
-    private void stopServer() throws SQLException {
+    private void saveAndStopServer() throws SQLException {
+        con.commit();
         con.prepareStatement("SHUTDOWN").execute();
         server.stop();
     }
