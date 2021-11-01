@@ -23,6 +23,7 @@ public class HSQLDbProvider implements Provider {
         try {
             prepareDatabase();
             insertRecord(events);
+            stopServer();
         } catch (SQLException | ClassNotFoundException e) {
             logger.error("Unexpected error occurred while preparing database.", e);
             throw e;
@@ -33,7 +34,8 @@ public class HSQLDbProvider implements Provider {
 
     @Override
     public void producerStatus(boolean complete) {
-
+        //todo: need to implement this method if Provider is treated as a consumer.
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     private void startServer() {
@@ -62,8 +64,6 @@ public class HSQLDbProvider implements Provider {
                 ex.printStackTrace();
             }
         });
-
-        stopServer();
     }
 
     private void stopServer() {
@@ -82,11 +82,11 @@ public class HSQLDbProvider implements Provider {
      */
     private void createTable() throws SQLException {
         final ResultSet rs = con.getMetaData().getTables(null, null, "EVENT", null);
-        if(!rs.next()){
+        if (!rs.next()) {
             logger.info("Database table 'Event' not found. Creating table");
             con.prepareStatement(
                     "create table event(eventid varchar(100),duration int,type varchar(20),host varchar(60),alert boolean);"
-                    ).execute();
+            ).execute();
         }
     }
 
