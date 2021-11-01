@@ -16,9 +16,11 @@ import static org.junit.Assert.assertThat;
 
 public class LogProducerTest {
 
+    public static final String SMALL_LOG = "small-log.txt";
+    public static final String MEDIUM_LOG = "medium-log.txt";
+    private final static String SAMPLE_LOG_KEY = "scsmbstgra";
     private ConcurrentHashMap<String, List<Log>> container;
     private Object mutex;
-    private final static String SAMPLE_LOG_KEY = "scsmbstgra";
 
     @Before
     public void setUp() {
@@ -28,7 +30,7 @@ public class LogProducerTest {
 
     @Test
     public void producerShouldAddLogInMap() throws IOException {
-        Path path = Paths.get(this.getClass().getClassLoader().getResource("small-log.txt").getPath());
+        Path path = Paths.get(this.getClass().getClassLoader().getResource(SMALL_LOG).getPath());
         final Producer producer = new LogProducer(mutex);
 
         producer.produce(container, path);
@@ -40,7 +42,7 @@ public class LogProducerTest {
 
     @Test
     public void producerShouldAddLogInMapForMediumSizeFile() throws IOException {
-        Path path = Paths.get(this.getClass().getClassLoader().getResource("medium-log.txt").getPath());
+        Path path = Paths.get(this.getClass().getClassLoader().getResource(MEDIUM_LOG).getPath());
         final Producer producer = new LogProducer(mutex);
 
         producer.produce(container, path);

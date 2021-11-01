@@ -34,20 +34,16 @@ public class LogConsumerTest {
         final LogConsumer logConsumer = new LogConsumer(mutex);
         final ArrayList<Event> events = new ArrayList<>();
         ExecutorService executor = Executors.newFixedThreadPool(1);
-        executor.execute(() -> {
-            logConsumer.consume(container, events);
-
-        });
+        executor.execute(() -> logConsumer.consume(container, events));
 
         executor.awaitTermination(2, TimeUnit.SECONDS);
         logConsumer.producerStatus(true);
+
         assertThat("events should contain 3 objects", events.size(), equalTo(3));
     }
 
     /**
      * Uses LogProducer to generate sample data
-     *
-     * @throws IOException
      */
     private void updateContainerWithSampleLog() throws IOException {
         Path path = Paths.get(this.getClass().getClassLoader().getResource("small-log.txt").getPath());

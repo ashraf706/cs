@@ -20,6 +20,7 @@ public class HSQLDbProviderTest {
 
         final Provider provider = new HSQLDbProvider();
         final boolean status = provider.consume(events);
+
         assertThat("Db operation executed successfully", status, is(true));
     }
 }
