@@ -1,8 +1,3 @@
-##Requirements
-
-java 8 and following maven dependencies
-junit 5, hamcrest and maven-surefire-plugin
-
 ##Running the Tests
 
 - Execute `git https://github.com/ashraf706/cs.git` to clone the public repository to your local machine.
