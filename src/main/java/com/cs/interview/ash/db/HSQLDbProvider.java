@@ -60,13 +60,15 @@ public class HSQLDbProvider implements Provider {
                 statement.setBoolean(5, e.isAlert());
 
                 statement.execute();
+                con.commit();
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
         });
     }
 
-    private void stopServer() {
+    private void stopServer() throws SQLException {
+        con.prepareStatement("SHUTDOWN").execute();
         server.stop();
     }
 
@@ -84,9 +86,9 @@ public class HSQLDbProvider implements Provider {
         final ResultSet rs = con.getMetaData().getTables(null, null, "EVENT", null);
         if (!rs.next()) {
             logger.info("Database table 'Event' not found. Creating table");
-            con.prepareStatement(
+            con.createStatement().executeUpdate(
                     "create table event(eventid varchar(100),duration int,type varchar(20),host varchar(60),alert boolean);"
-            ).execute();
+            );
         }
     }
 
