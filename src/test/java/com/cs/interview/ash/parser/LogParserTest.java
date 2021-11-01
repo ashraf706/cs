@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
 public class LogParserTest {
 
     @Test
-    public void parserShouldCreateEvent() {
+    public void parserShouldCreateEvent() throws InterruptedException {
         final Object mutex = new Object();
         final Producer producer = new LogProducer(mutex);
         final Consumer consumer = new LogConsumer(mutex);
@@ -32,7 +32,7 @@ public class LogParserTest {
         final LogParser parser = new LogParser(producer, consumer);
 
         parser.parse(container,events, path);
-
+        Thread.sleep(1000);  //todo: This sleep is a quick fix. Has to implement properly
         assertThat("events should contain 13 objects", events.size(), equalTo(13));
     }
 }

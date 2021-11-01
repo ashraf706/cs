@@ -11,8 +11,11 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
+/**
+ * This class create couple of threads to run producer and consumer in a
+ * separate thread.
+ */
 public class LogParser implements Parser {
     private final Producer producer;
     private final Consumer consumer;
@@ -30,11 +33,6 @@ public class LogParser implements Parser {
         executor.execute(consumerRunnable(consumer, container, events));
 
         executor.shutdown();
-        try {
-            executor.awaitTermination(5, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private Runnable producerRunnable(Producer producer, ConcurrentHashMap<String, List<Log>> container, Path path) {
@@ -49,8 +47,6 @@ public class LogParser implements Parser {
 
     private Runnable consumerRunnable(Consumer consumer,ConcurrentHashMap<String, List<Log>> container,
                                             List<Event> events){
-        return () ->{
-            consumer.consume(container, events);
-        };
+        return () -> consumer.consume(container, events);
     }
 }
