@@ -22,12 +22,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Hello world!
- *
  */
-public class App 
-{
+public class App {
     private static final Logger logger = LoggerFactory.getLogger(App.class);
     private static String filePath;
+
     public static void main( String[] args )
     {
         if(!validInput(args)){
@@ -44,7 +43,7 @@ public class App
         producer.register(consumer);
         final LogParser parser = new LogParser(producer, consumer);
 
-        parser.parse(container,events, path);
+        parser.parse(container, events, path);
 
         addEventToDatabase(events);
 
@@ -59,8 +58,7 @@ public class App
         } catch (SQLException e) {
             logger.error("Unexpected SQL exception occurred: ", e);
         } catch (ClassNotFoundException e) {
-
-            logger.error("Unexpected excetion occurred", e);
+            logger.error("Unexpected exception occurred", e);
         }
     }
 
@@ -68,18 +66,26 @@ public class App
      * Simple file path input sanitiser.
      * Returns true for a valid file path
      */
-    private static boolean validInput(String[] args){
-        if(args.length == 0){
+    private static boolean validInput(String[] args) {
+        if (args.length == 0) {
             System.out.println("Please provide a valid log file path.");
-            logger.error("File path not provided");
+            logger.error("File path parameter not provided by the user.");
             return false;
         } else {
             filePath = args[0];
             final String msg = "File path: " + filePath;
             System.out.println(msg);
             logger.info(msg);
+
             File file = new File(filePath);
-            return file.exists() && !file.isDirectory();
+            if (file.exists() && !file.isDirectory()) {
+                logger.info("File path is valid. Continue working..");
+                return true;
+            } else {
+                System.out.println("Provided file path is not a valid file path. Please provide a valid log file path.");
+                logger.error("User provided invalid file path: {}", args[0]);
+                return false;
+            }
         }
     }
 }
